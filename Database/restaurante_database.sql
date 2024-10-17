@@ -26,7 +26,7 @@ estado_origem VARCHAR(20),
 CONSTRAINT CHECK (estado_origem = 'Alagoas' OR estado_origem = 'Bahia' OR estado_origem = 'Ceará' OR estado_origem = 'Maranhão' OR estado_origem = 'Paraíba' OR estado_origem = 'Pernambuco' OR estado_origem = 'Piauí' OR estado_origem = 'Rio Grande do Norte' OR estado_origem = 'Sergipe'
 OR estado_origem = 'Acre' OR estado_origem = 'Amapá' OR estado_origem = 'Amazonas' OR estado_origem = 'Pará' OR estado_origem = 'Rondônia' OR estado_origem = 'Roraima' OR estado_origem = 'Tocantins'
 OR estado_origem = 'Espírito Santo' OR estado_origem = 'Minas Gerais' OR estado_origem = 'Rio de Janeiro' OR estado_origem = 'São Paulo'
-OR estado_origem = 'Centro-Oeste' OR estado_origem = 'Distrito Federal' OR estado_origem = 'Goiás' OR estado_origem = 'Mato Grosso' OR estado_origem = 'Mato Grosso do Sul')
+ OR estado_origem = 'Distrito Federal' OR estado_origem = 'Goiás' OR estado_origem = 'Mato Grosso' OR estado_origem = 'Mato Grosso do Sul')
 );
 
 CREATE TABLE IF NOT EXISTS ingredientes(
@@ -56,3 +56,7 @@ dia DATE,
 hora TIME,
 valor REAL
 );
+
+CREATE USER 'Administrador'@'localhost' IDENTIFIED BY 'adm7263';
+CREATE USER 'Gerente'@'localhost' IDENTIFIED BY 'g@452';
+CREATE USER 'Funcionário'@'localhost' IDENTIFIED BY 'Func_1267';
