@@ -59,4 +59,7 @@ valor REAL
 
 CREATE USER 'Administrador'@'localhost' IDENTIFIED BY 'adm7263';
 CREATE USER 'Gerente'@'localhost' IDENTIFIED BY 'g@452';
-CREATE USER 'Funcionário'@'localhost' IDENTIFIED BY 'Func_1267';
+CREATE USER 'Funcionario'@'localhost' IDENTIFIED BY 'Func_1267';
+
+GRANT ALL ON restaurante TO 'Administrador'@'localhost';
+GRANT SELECT, INSERT ON venda TO 'Funcionario'@'localhost';
