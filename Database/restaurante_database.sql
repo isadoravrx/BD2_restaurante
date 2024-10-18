@@ -61,5 +61,11 @@ CREATE USER 'Administrador'@'localhost' IDENTIFIED BY 'adm7263';
 CREATE USER 'Gerente'@'localhost' IDENTIFIED BY 'g@452';
 CREATE USER 'Funcionario'@'localhost' IDENTIFIED BY 'Func_1267';
 
-GRANT ALL ON restaurante TO 'Administrador'@'localhost';
-GRANT SELECT, INSERT ON venda TO 'Funcionario'@'localhost';
+GRANT ALL ON *.* TO 'Administrador'@'localhost';
+
+GRANT SELECT, DELETE, UPDATE ON *.* TO 'Gerente'@'localhost';
+
+GRANT INSERT ON *.* TO 'Funcionario'@'localhost';
+GRANT SELECT ON venda TO 'Funcionario'@'localhost';
+
+FLUSH PRIVILEGES;
