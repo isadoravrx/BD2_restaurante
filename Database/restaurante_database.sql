@@ -142,3 +142,14 @@ INSERT INTO venda (id_cliente, id_prato, quantidade, dia, hora, valor) VALUES
 (8, 3, 1, '2024-10-17', '18:00:00', 55),
 (9, 6, 2, '2024-10-18', '19:00:00', 60),
 (10, 8, 1, '2024-10-19', '20:30:00', 50);
+
+CREATE VIEW arrecadacao_prato_por_mes AS -- mostra a quantidade vendida e a arrecadação de um prato em determinado mês
+SELECT p.nome AS prato, 
+       MONTH(v.dia) AS mes,
+       SUM(v.quantidade) AS quantidade_vendida,
+       SUM(v.valor) AS total_arrecadado
+FROM prato p
+JOIN venda v ON p.id = v.id_prato
+GROUP BY p.nome, MONTH(v.dia);
+
+SELECT * FROM arrecadacao_prato_por_mes;
