@@ -180,7 +180,6 @@ GROUP BY c.id, c.nome
 ORDER BY total_gasto DESC;
 
 SELECT * FROM total_vendas_por_cliente;
-
 -- Triggers
 
 DELIMITER $$
@@ -228,3 +227,4 @@ BEGIN
 END$$
 
 DELIMITER ;
+
