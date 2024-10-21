@@ -3,9 +3,9 @@ import mysql from 'mysql2/promise';
 
 const mysqlConfig = {
   host: 'localhost',
-  user: 'Administrador',
-  password: 'adm7263',
+  user: 'root',
   database : 'restaurante',
+  multipleStatements: true,
 };
 
 const server = http.createServer(async (req, res) => {
@@ -17,14 +17,19 @@ const server = http.createServer(async (req, res) => {
   });
   
   const connection = await mysql.createConnection(mysqlConfig);
-  console.log(req);
 
-  if (req.method === 'POST' && req.url === '/setup-database') {
-    req.on('end', async () => {
+  if(req.method === 'DELETE' && req.url === '/database'){
+    await connection.execute('DROP DATABASE restaurante');
+    res.writeHead(200);
+    res.end(JSON.stringify('Database deletado'));
+  }
+
+  
+  else if (req.method === 'POST' && req.url === '/setup-database') {
       try {
         // Cria o banco de dados, se não existir
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS restaurante`);
-        await connection.execute(`USE restaurante`); 
+        //await connection.execute(`CREATE DATABASE IF NOT EXISTS restaurante`);
+        //await connection.execute(`USE restaurante`); 
 
         // Executa o restante do SQL
         const sqlSetup = `
@@ -84,10 +89,6 @@ const server = http.createServer(async (req, res) => {
           hora TIME,
           valor REAL
           );
-
-          CREATE USER 'Administrador'@'localhost' IDENTIFIED BY 'adm7263';
-          CREATE USER 'Gerente'@'localhost' IDENTIFIED BY 'g@452';
-          CREATE USER 'Funcionario'@'localhost' IDENTIFIED BY 'Func_1267';
 
           GRANT ALL ON *.* TO 'Administrador'@'localhost';
           FLUSH PRIVILEGES;
@@ -180,8 +181,6 @@ const server = http.createServer(async (req, res) => {
           JOIN venda v ON p.id = v.id_prato
           GROUP BY p.nome, MONTH(v.dia);
 
-          SELECT * FROM arrecadacao_prato_por_mes;
-
           CREATE VIEW ingredientes_vencimento_proximo AS -- informa os ingredientes com validade dentro dos próximos 30 dias ou já expiradas, e em qual prato ocorre seu uso
           SELECT i.nome AS ingrediente,
                 i.data_validade AS validade,
@@ -194,9 +193,7 @@ const server = http.createServer(async (req, res) => {
           WHERE DATEDIFF(i.data_validade, CURDATE()) <= 30
           GROUP BY i.nome, i.data_validade, p.nome
           ORDER BY dias_para_vencimento;
-
-          SELECT * FROM ingredientes_vencimento_proximo;
-
+        
 
           CREATE VIEW total_consumo_por_cliente AS 
           SELECT c.nome AS cliente,
@@ -220,7 +217,6 @@ const server = http.createServer(async (req, res) => {
       } finally {
         await connection.end();
       }
-    });
   
   } 
 
