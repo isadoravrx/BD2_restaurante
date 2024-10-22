@@ -152,7 +152,6 @@ FROM prato p
 JOIN venda v ON p.id = v.id_prato
 GROUP BY p.nome, MONTH(v.dia);
 
-SELECT * FROM arrecadacao_prato_por_mes;
 
 CREATE VIEW ingredientes_vencimento_proximo AS -- informa os ingredientes com validade dentro dos próximos 30 dias ou já expiradas, e em qual prato ocorre seu uso
 SELECT i.nome AS ingrediente,
@@ -167,8 +166,6 @@ WHERE DATEDIFF(i.data_validade, CURDATE()) <= 30
 GROUP BY i.nome, i.data_validade, p.nome
 ORDER BY dias_para_vencimento;
 
-SELECT * FROM ingredientes_vencimento_proximo;
-
 
 CREATE VIEW total_consumo_por_cliente AS -- informa o total de consumo por cliente
 SELECT c.nome AS cliente,
@@ -179,7 +176,6 @@ JOIN venda v ON c.id = v.id_cliente
 GROUP BY c.id, c.nome
 ORDER BY total_gasto DESC;
 
-SELECT * FROM total_vendas_por_cliente;
 -- Triggers
 
 DELIMITER $$
