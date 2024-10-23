@@ -4,6 +4,8 @@ import {databaseRoutes} from './routes/databaseRoutes';
 import { pratoRoutes } from './routes/pratoRoutes';
 import { fornecedorRoutes } from './routes/fornecedorRoutes';
 import { ingredientesRoutes } from './routes/ingredientesRoutes';
+import { usosRoutes } from './routes/usosRoutes';
+import { vendaRoutes } from './routes/vendaRoutes';
 const server = http.createServer((req, res) => {
     
     if(req.url === '/database'){
@@ -16,9 +18,11 @@ const server = http.createServer((req, res) => {
         fornecedorRoutes(req,res);
     }else if(req.url === '/ingredientes'){
         ingredientesRoutes(req,res);
+    }else if(req.url === '/usos'){
+        usosRoutes(req,res);
+    }else if(req.url === '/venda'){
+        vendaRoutes(req,res);
     }
-
-    //adicionar demais routes
 });
 
 const PORT = 3000;
