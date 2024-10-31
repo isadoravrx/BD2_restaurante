@@ -12,8 +12,26 @@ export const createDatabase = async (req, res) => {
     const connection = await connectToDatabase();
 
     try {   
-        const sqlSetup = `
+        
+        await createTables(connection);
+        await grantPermissions(connection);
+        await insertValues(connection);
+        await createViews(connection);
+        await createTriggers(connection);
+        res.writeHead(201);
+        res.end(JSON.stringify({ message: 'Banco de dados e tabelas criados com sucesso!' }));
+      } catch (error) {
+        console.error("Erro ao configurar o banco de dados:", error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Erro ao configurar o banco de dados' }));
+      } finally {
+        await connection.end();
+      }
+};
 
+export const createTables = async (connection) =>{
+    try{
+    const sql = `
         CREATE TABLE IF NOT EXISTS cliente(
             id INT AUTO_INCREMENT PRIMARY KEY,
             nome VARCHAR(50),
@@ -69,18 +87,44 @@ export const createDatabase = async (req, res) => {
             hora TIME,
             valor REAL
             );
-            
-            GRANT ALL ON *.* TO 'Administrador'@'localhost';
-            FLUSH PRIVILEGES;
-            
-            GRANT SELECT, DELETE, UPDATE ON *.* TO 'Gerente'@'localhost';
-            FLUSH PRIVILEGES;
-            
-            GRANT INSERT ON *.* TO 'Funcionario'@'localhost'; 
-            GRANT SELECT ON venda TO 'Funcionario'@'localhost';
-            FLUSH PRIVILEGES;
-            
-            INSERT INTO cliente (nome, sexo, idade, nascimento, pontos) VALUES 
+    `;
+
+    await connection.query(sql);
+    
+    }catch(error){
+        console.error("Erro ao criar as tabelas", error);
+
+    }
+}
+
+export const grantPermissions = async(connection) => {
+    try{
+    const sql = 
+    `
+        GRANT ALL ON *.* TO 'Administrador'@'localhost';
+        FLUSH PRIVILEGES;
+        
+        GRANT SELECT, DELETE, UPDATE ON *.* TO 'Gerente'@'localhost';
+        FLUSH PRIVILEGES;
+        
+        GRANT INSERT ON *.* TO 'Funcionario'@'localhost'; 
+        GRANT SELECT ON venda TO 'Funcionario'@'localhost';
+        FLUSH PRIVILEGES;
+    `;
+
+    await connection.query(sql);
+
+    }catch(error){
+        console.error("Erro no grant", error);
+
+    }
+}
+
+export const insertValues = async(connection) =>{
+    try{
+    const sql = 
+    `
+        INSERT INTO cliente (nome, sexo, idade, nascimento, pontos) VALUES 
             ('Ana Souza', 'f', 28, '1996-02-12', 120),
             ('Bruno Lima', 'm', 35, '1989-08-09', 80),
             ('Carlos Pereira', 'm', 42, '1981-04-15', 200),
@@ -151,7 +195,21 @@ export const createDatabase = async (req, res) => {
             (8, 3, 1, '2024-10-17', '18:00:00', 55),
             (9, 6, 2, '2024-10-18', '19:00:00', 60),
             (10, 8, 1, '2024-10-19', '20:30:00', 50);
-            
+    `;
+
+    await connection.query(sql);
+    
+    }catch(error){
+        console.error("Erro ao Inserir valores", error);
+
+    }
+
+}
+
+export const createViews = async (connection) =>{
+    try{
+    const sql = 
+    `
             CREATE VIEW arrecadacao_prato_por_mes AS -- mostra a quantidade vendida e a arrecadação de um prato em determinado mês
             SELECT p.nome AS prato, 
                    MONTH(v.dia) AS mes,
@@ -184,58 +242,65 @@ export const createDatabase = async (req, res) => {
             JOIN venda v ON c.id = v.id_cliente
             GROUP BY c.id, c.nome
             ORDER BY total_gasto DESC;
-            
-            -- Triggers
-            
-            
-            CREATE TRIGGER atualizar_pontos -- atualiza a quantidade de pontos
-            AFTER INSERT ON venda
-            FOR EACH ROW
-            BEGIN
-                UPDATE cliente
-                SET pontos = pontos + FLOOR(NEW.valor / 10)
-                WHERE id = NEW.id_cliente;
-            END;
-            
-            CREATE TRIGGER trigger_verificar_disponibilidade -- verifica a disponibilidade do prato
-            BEFORE INSERT ON venda
-            FOR EACH ROW
-            BEGIN
-                IF NOT EXISTS (SELECT 1 FROM prato WHERE id = NEW.id_prato AND disponibilidade = TRUE) THEN
-                    SIGNAL SQLSTATE '45000' 
-                    SET MESSAGE_TEXT = 'Prato indisponível para compra'; 
-                END IF;
-            END;
-            
-            CREATE TRIGGER trigger_reduzir_ingredientes -- reduz a quantidade dos ingredientes
-            AFTER INSERT ON venda
-            FOR EACH ROW
-            BEGIN
-                UPDATE ingredientes
-                SET quantidade = quantidade - 1
-                WHERE id IN (
-                    SELECT id_ingrediente 
-                    FROM usos
-                    WHERE id_prato = NEW.id_prato
-                );
-            END;
-            
-            
+    `;
 
-        `;
+    await connection.query(sql);
+    
+    }catch(error){
+        console.error("Erro ao criar as views", error);
 
-        await connection.query(sqlSetup);
+    }   
+}
 
-        res.writeHead(201);
-        res.end(JSON.stringify({ message: 'Banco de dados e tabelas criados com sucesso!' }));
-      } catch (error) {
-        console.error("Erro ao configurar o banco de dados:", error);
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: 'Erro ao configurar o banco de dados' }));
-      } finally {
-        await connection.end();
-      }
-};
+export const createTriggers = async (connection) => {
+
+    try{
+    const sql = 
+    `
+        -- Triggers
+                
+                
+        CREATE TRIGGER atualizar_pontos -- atualiza a quantidade de pontos
+        AFTER INSERT ON venda
+        FOR EACH ROW
+        BEGIN
+            UPDATE cliente
+            SET pontos = pontos + FLOOR(NEW.valor / 10)
+            WHERE id = NEW.id_cliente;
+        END;
+        
+        CREATE TRIGGER trigger_verificar_disponibilidade -- verifica a disponibilidade do prato
+        BEFORE INSERT ON venda
+        FOR EACH ROW
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM prato WHERE id = NEW.id_prato AND disponibilidade = TRUE) THEN
+                SIGNAL SQLSTATE '45000' 
+                SET MESSAGE_TEXT = 'Prato indisponível para compra'; 
+            END IF;
+        END;
+        
+        CREATE TRIGGER trigger_reduzir_ingredientes -- reduz a quantidade dos ingredientes
+        AFTER INSERT ON venda
+        FOR EACH ROW
+        BEGIN
+            UPDATE ingredientes
+            SET quantidade = quantidade - 1
+            WHERE id IN (
+                SELECT id_ingrediente 
+                FROM usos
+                WHERE id_prato = NEW.id_prato
+            );
+        END;
+    
+    `;
+
+    await connection.query(sql);
+    
+    }catch(error){
+        console.error("Erro ao criar os triggers", error);
+
+    }
+}
 
 export const deleteDatabase = async (req, res) => {
     const connection = await connectToDatabase();
