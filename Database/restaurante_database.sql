@@ -177,9 +177,6 @@ GROUP BY c.id, c.nome
 ORDER BY total_gasto DESC;
 
 -- Triggers
-
-DELIMITER $$
-
 CREATE TRIGGER atualizar_pontos -- atualiza a quantidade de pontos
 AFTER INSERT ON venda
 FOR EACH ROW
@@ -187,12 +184,10 @@ BEGIN
     UPDATE cliente
     SET pontos = pontos + FLOOR(NEW.valor / 10)
     WHERE id = NEW.id_cliente;
-END$$
-
-DELIMITER ;
+END
 
 
-DELIMITER $$
+
 
 CREATE TRIGGER trigger_verificar_disponibilidade -- verifica a disponibilidade do prato
 BEFORE INSERT ON venda
@@ -202,12 +197,10 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Prato indisponível para compra'; 
     END IF;
-END$$
-
-DELIMITER ;
+END
 
 
-DELIMITER $$
+
 
 CREATE TRIGGER trigger_reduzir_ingredientes -- reduz a quantidade dos ingredientes
 AFTER INSERT ON venda
@@ -220,7 +213,32 @@ BEGIN
         FROM usos
         WHERE id_prato = NEW.id_prato
     );
-END$$
+END
 
-DELIMITER ;
 
+CREATE TRIGGER trigger_verificar_validade_ingredientes -- validade
+AFTER UPDATE ON ingredientes
+FOR EACH ROW
+BEGIN
+    IF NEW.data_validade < CURRENT_DATE THEN
+        UPDATE prato
+        SET disponibilidade = FALSE
+        WHERE id IN (
+            SELECT id_prato
+            FROM usos
+            WHERE id_ingrediente = NEW.id
+        );
+    END IF;
+END
+
+
+-- function
+CREATE FUNCTION calculo(valor_compra DECIMAL(10, 2))
+RETURNS INT
+BEGIN
+    DECLARE pontos INT;
+    
+    SET pontos = FLOOR(valor_compra / 10);
+    
+    RETURN pontos;
+END
