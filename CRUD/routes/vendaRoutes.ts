@@ -1,11 +1,11 @@
 import http from 'http';
 import {createVenda, getVenda } from '../controllers/vendaController';
 
-export const vendaRoutes = (req, res) => {
+export const vendaRoutes = (req, res, connection) => {
     if (req.method === 'GET') {
-        getVenda(req, res);
+        getVenda(req, res, connection);
     }else if(req.method === 'POST'){
-        createVenda(req, res);
+        createVenda(req, res, connection);
     } 
     else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });

@@ -1,6 +1,6 @@
 import { connectToDatabase } from '../config/Database';
 
-export const createFornecedor = async (req, res) => {
+export const createFornecedor = async (req, res, connection) => {
     res.setHeader('Content-Type', 'application/json');
     let body = '';
 
@@ -8,26 +8,24 @@ export const createFornecedor = async (req, res) => {
         body += chunk.toString();
     });
 
-    const connection = await connectToDatabase();
-    const { nome, estado_origem} = JSON.parse(body);
+    req.on('end', async () => {
+      const { nome, estado_origem} = JSON.parse(body);
 
-    try { 
-      await connection.execute(
-        'INSERT INTO fornecedor (nome, estado_origem) VALUES (?, ?)',
-        [nome, estado_origem]
-      );
-      res.writeHead(201);
-      res.end(JSON.stringify({ message: 'Fornecedor adicionado com sucesso!' }));
-    } catch (error) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: 'Erro ao adicionar Fornecedor' }));
-    } finally {
-      await connection.end();
-    }
+      try { 
+        await connection.execute(
+          'INSERT INTO fornecedor (nome, estado_origem) VALUES (?, ?)',
+          [nome, estado_origem]
+        );
+        res.writeHead(201);
+        res.end(JSON.stringify({ message: 'Fornecedor adicionado com sucesso!' }));
+      } catch (error) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Erro ao adicionar Fornecedor' }));
+      } 
+    });
 };
 
-export const getFornecedor = async (req, res) => {
-  const connection = await connectToDatabase();
+export const getFornecedor = async (req, res, connection) => {
   
   try {
     const [fornecedores] = await connection.execute('SELECT * FROM fornecedor');
@@ -36,7 +34,5 @@ export const getFornecedor = async (req, res) => {
   } catch (error) {
     res.writeHead(500);
     res.end(JSON.stringify({ error: 'Erro ao buscar Fornecedores' }));
-  } finally {
-    await connection.end();
-  }
+  } 
 };

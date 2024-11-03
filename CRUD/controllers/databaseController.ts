@@ -1,6 +1,6 @@
 import { connectToDatabase } from '../config/Database';
 
-export const createDatabase = async (req, res) => {
+export const createDatabase = async (req, res, connection) => {
     res.setHeader('Content-Type', 'application/json');
     let body = '';
 
@@ -8,25 +8,22 @@ export const createDatabase = async (req, res) => {
         body += chunk.toString();
     });
 
-    
-    const connection = await connectToDatabase();
-
-    try {   
-        
-        await createTables(connection);
-        await grantPermissions(connection);
-        await insertValues(connection);
-        await createViews(connection);
-        await createTriggers(connection);
-        res.writeHead(201);
-        res.end(JSON.stringify({ message: 'Banco de dados e tabelas criados com sucesso!' }));
-      } catch (error) {
-        console.error("Erro ao configurar o banco de dados:", error);
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: 'Erro ao configurar o banco de dados' }));
-      } finally {
-        await connection.end();
-      }
+    req.on('end', async () => {
+        try {   
+            
+            await createTables(connection);
+            await grantPermissions(connection);
+            await insertValues(connection);
+            await createViews(connection);
+            await createTriggers(connection);
+            res.writeHead(201);
+            res.end(JSON.stringify({ message: 'Banco de dados e tabelas criados com sucesso!' }));
+        } catch (error) {
+            console.error("Erro ao configurar o banco de dados:", error);
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Erro ao configurar o banco de dados' }));
+        } 
+    });
 };
 
 export const createTables = async (connection) =>{
@@ -302,8 +299,7 @@ export const createTriggers = async (connection) => {
     }
 }
 
-export const deleteDatabase = async (req, res) => {
-    const connection = await connectToDatabase();
+export const deleteDatabase = async (req, res, connection) => {
     await connection.execute('DROP DATABASE restaurante');
     res.writeHead(200);
     res.end(JSON.stringify('Database deletado'));
