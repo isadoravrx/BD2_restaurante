@@ -231,6 +231,25 @@ BEGIN
     END IF;
 END
 
+-- SHOW VARIABLES LIKE 'event_scheduler';
+-- SET GLOBAL event_scheduler = ON;
+
+CREATE EVENT atualizar_disponibilidade_pratos 
+ON SCHEDULE EVERY 2 MINUTE 
+DO
+BEGIN
+    UPDATE prato
+    SET disponibilidade = FALSE
+    WHERE id IN (
+        SELECT id_prato
+        FROM usos
+        WHERE id_ingrediente IN (
+            SELECT id
+            FROM ingredientes
+            WHERE data_validade < CURRENT_DATE
+        )
+    );
+END;
 
 -- function
 CREATE FUNCTION calculo(valor_compra DECIMAL(10, 2))
