@@ -10,7 +10,7 @@ import {usuarioRoutes} from './routes/usuarioRoutes'
 import {connectToDatabase} from './config/Database';
 import {viewRoutes} from './routes/viewRoutes';
 import {functionRoutes} from './routes/functionRoutes'
-
+import {storedProceduresRoutes}  from './routes/storedProceduresRoutes';
 let connection ;
 
 
@@ -49,7 +49,7 @@ const startServer = async () => {
         }else if(req.url === '/function'){
             functionRoutes(req,res,connection);
         }else if(req.url === '/storedProcedures'){
-
+            storedProceduresRoutes(req,res,connection);
         }
     });
     const PORT = 3000;
