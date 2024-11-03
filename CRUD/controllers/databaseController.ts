@@ -16,6 +16,9 @@ export const createDatabase = async (req, res, connection) => {
             await insertValues(connection);
             await createViews(connection);
             await createTriggers(connection);
+            await createEvents(connection);
+            await craeteFunctions(connection);
+            await createStoredProcedures(connection);
             res.writeHead(201);
             res.end(JSON.stringify({ message: 'Banco de dados e tabelas criados com sucesso!' }));
         } catch (error) {
@@ -265,7 +268,10 @@ export const createTriggers = async (connection) => {
             SET pontos = pontos + FLOOR(NEW.valor / 10)
             WHERE id = NEW.id_cliente;
         END;
-        
+
+
+
+
         CREATE TRIGGER trigger_verificar_disponibilidade -- verifica a disponibilidade do prato
         BEFORE INSERT ON venda
         FOR EACH ROW
@@ -275,7 +281,10 @@ export const createTriggers = async (connection) => {
                 SET MESSAGE_TEXT = 'Prato indisponível para compra'; 
             END IF;
         END;
-        
+
+
+
+
         CREATE TRIGGER trigger_reduzir_ingredientes -- reduz a quantidade dos ingredientes
         AFTER INSERT ON venda
         FOR EACH ROW
@@ -288,6 +297,22 @@ export const createTriggers = async (connection) => {
                 WHERE id_prato = NEW.id_prato
             );
         END;
+
+
+        CREATE TRIGGER trigger_verificar_validade_ingredientes -- validade
+        AFTER UPDATE ON ingredientes
+        FOR EACH ROW
+        BEGIN
+            IF NEW.data_validade < CURRENT_DATE THEN
+                UPDATE prato
+                SET disponibilidade = FALSE
+                WHERE id IN (
+                    SELECT id_prato
+                    FROM usos
+                    WHERE id_ingrediente = NEW.id
+                );
+            END IF;
+        END;
     
     `;
 
@@ -295,6 +320,163 @@ export const createTriggers = async (connection) => {
     
     }catch(error){
         console.error("Erro ao criar os triggers", error);
+
+    }
+}
+
+
+export const createEvents = async(connection) => {
+    try{
+    const sql = 
+    `
+        CREATE EVENT atualizar_disponibilidade_pratos 
+        ON SCHEDULE EVERY 1 DAY 
+        DO
+        BEGIN
+            UPDATE prato
+            SET disponibilidade = FALSE
+            WHERE id IN (
+                SELECT id_prato
+                FROM usos
+                WHERE id_ingrediente IN (
+                    SELECT id
+                    FROM ingredientes
+                    WHERE data_validade < CURRENT_DATE
+                )
+            );
+        END;
+    `;
+
+    await connection.query(sql);
+
+    }catch(error){
+        console.error("Erro ao criar os events", error);
+
+    }
+}
+
+export const craeteFunctions = async(connection) => {
+    try{
+    const sql = 
+    `
+        CREATE FUNCTION calculo(valor_compra DECIMAL(10, 2))
+        RETURNS INT
+        BEGIN
+            DECLARE pontos INT;
+            
+            SET pontos = FLOOR(valor_compra / 10);
+            
+            RETURN pontos;
+        END
+    `;
+
+    await connection.query(sql);
+
+    }catch(error){
+        console.error("Erro ao criar os Functions", error);
+
+    }
+}
+
+
+export const createStoredProcedures = async(connection) => {
+    try{
+    const sql = 
+    `
+        -- Reajuste: Receba um reajuste em percentual e aumente o valor de todos os pratos. 
+        
+
+        CREATE PROCEDURE Reajuste(IN percentual DECIMAL(5, 2))
+        BEGIN
+            IF percentual > 0 THEN
+                UPDATE prato
+                SET valor = valor * (1 + (percentual / 100));
+            ELSE
+                SIGNAL SQLSTATE '45000' 
+                SET MESSAGE_TEXT = 'O percentual de reajuste deve ser maior que zero.';
+            END IF;
+        END;
+
+        -- OBS: Como é descrito que AUMENTE e não ALTERE o valor, subentendesse que o percentual DEVE ser positivo.
+
+
+        -- Sorteio: Sorteie aleatoriamente um cliente, para que este cliente receba uma premiação de 100 pontos. 
+        
+        CREATE PROCEDURE Sorteio()
+        BEGIN
+            DECLARE cliente_id INT;
+            DECLARE pontuacao INT;
+            
+            SELECT id, pontos INTO cliente_id, pontuacao
+            FROM cliente
+            ORDER BY RAND()
+            LIMIT 1;
+            
+            UPDATE cliente
+            SET pontos = pontos + 100
+            WHERE id = cliente_id;
+            
+            SELECT cliente_id AS Cliente_Sorteado, 
+                (SELECT nome 
+                    FROM cliente 
+                    WHERE id = cliente_id) AS Nome_Cliente,
+                    pontuacao AS Pontuacao_Anterior,
+                    (pontuacao + 100) AS Nova_Pontuacao;
+        END;
+
+       
+
+        --  Use todos os pontos do usuário para comprar um prato, cada ponto está na proporção de 1:1 em valor de reais, caso o valor do prato tenha centavos use 
+        -- um ponto extra para cobrir estes centavos, e caso a quantidade de pontos for maior do que o valor do prato o cliente devera ficar com a diferença e não ter o saldo zerado.
+
+        CREATE PROCEDURE Gastar_pontos(IN cliente_id INT, prato_id INT)
+        BEGIN 
+            DECLARE pontuacao_cliente INT;
+            DECLARE valor_prato DECIMAL(10,2);
+            DECLARE pontos_necessarios INT;
+            DECLARE pontos_restantes INT;
+            
+            SELECT 
+                pontos INTO pontuacao_cliente
+            FROM cliente
+            WHERE id = cliente_id;
+            
+            SELECT 
+                valor INTO valor_prato
+            FROM prato
+            WHERE id = prato_id;
+            
+            SET pontos_necessarios = CEIL(valor_prato);
+            
+            IF pontuacao_cliente >= pontos_necessarios THEN
+                SET pontos_restantes = pontuacao_cliente - pontos_necessarios;
+                
+                UPDATE cliente
+                SET pontos = pontos_restantes
+                WHERE id = cliente_id;
+                
+                SELECT 
+                        cliente_id AS Cliente_ID,
+                        (SELECT nome 
+                        FROM cliente 
+                        WHERE id = cliente_id) AS Nome_Cliente,
+                        valor_prato AS Valor_Prato,
+                        pontos_necessarios as Pontos_Necessarios,
+                        pontuacao_cliente AS Pontuacao_Cliente,
+                        pontos_restantes AS Pontuacao_Restante_Cliente,
+                        'O prato foi adquirido com sucesso!' AS Status;
+            ELSE 
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Pontos insuficientes para realizar a compra.';
+            END IF;
+        END;
+        
+    `;
+
+    await connection.query(sql);
+
+    }catch(error){
+        console.error("Erro ao criar os Stored procedures", error);
 
     }
 }
