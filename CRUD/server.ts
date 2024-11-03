@@ -8,6 +8,7 @@ import { usosRoutes } from './routes/usosRoutes';
 import { vendaRoutes } from './routes/vendaRoutes';
 import {usuarioRoutes} from './routes/usuarioRoutes'
 import {connectToDatabase} from './config/Database';
+import {viewRoutes} from './routes/viewRoutes';
 
 let connection ;
 
@@ -42,6 +43,12 @@ const startServer = async () => {
             vendaRoutes(req,res, connection);
         }else if(req.url === '/usuario'){
             usuarioRoutes(req,res, setGlobalConnection);
+        }else if(req.url === '/view'){
+            viewRoutes(req,res,connection);
+        }else if(req.url === '/functions'){
+            
+        }else if(req.url === '/storedProcedures'){
+
         }
     });
     const PORT = 3000;
