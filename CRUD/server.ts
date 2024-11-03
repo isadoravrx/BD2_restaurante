@@ -9,6 +9,7 @@ import { vendaRoutes } from './routes/vendaRoutes';
 import {usuarioRoutes} from './routes/usuarioRoutes'
 import {connectToDatabase} from './config/Database';
 import {viewRoutes} from './routes/viewRoutes';
+import {functionRoutes} from './routes/functionRoutes'
 
 let connection ;
 
@@ -45,8 +46,8 @@ const startServer = async () => {
             usuarioRoutes(req,res, setGlobalConnection);
         }else if(req.url === '/view'){
             viewRoutes(req,res,connection);
-        }else if(req.url === '/functions'){
-            
+        }else if(req.url === '/function'){
+            functionRoutes(req,res,connection);
         }else if(req.url === '/storedProcedures'){
 
         }
