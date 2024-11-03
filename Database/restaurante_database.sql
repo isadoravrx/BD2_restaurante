@@ -235,7 +235,7 @@ END
 -- SET GLOBAL event_scheduler = ON;
 
 CREATE EVENT atualizar_disponibilidade_pratos 
-ON SCHEDULE EVERY 2 MINUTE 
+ON SCHEDULE EVERY 1 DAY 
 DO
 BEGIN
     UPDATE prato
