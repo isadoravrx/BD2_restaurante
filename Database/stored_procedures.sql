@@ -116,18 +116,14 @@ BEGIN
 	SELECT 
 		prato.nome AS nome_produto_mais_vendido,
 		(prato.valor * quantidade_produto_mais_vendido) AS valor_ganho_produto_mais_vendido
-	FROM venda
-    JOIN prato ON prato.id = venda.id_prato
-    WHERE id_prato = produto_mais_vendido_id
-    LIMIT 1;
+	FROM prato
+    WHERE prato.id = produto_mais_vendido_id;
     
 	SELECT 
 		prato.nome AS nome_produto_menos_vendido,
 		(prato.valor * quantidade_produto_menos_vendido) AS valor_ganho_produto_menos_vendido
-	FROM venda
-    JOIN prato ON prato.id = venda.id_prato
-    WHERE id_prato = produto_menos_vendido_id
-    LIMIT 1;
+	FROM prato
+    WHERE prato.id = produto_menos_vendido_id;
      
 	SELECT 
 		YEAR(venda.dia) AS ano_maior_venda__produto_mais_vendido,
