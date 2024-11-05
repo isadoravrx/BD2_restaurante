@@ -1,5 +1,3 @@
-
-
 INSERT INTO cliente (nome, sexo, idade, nascimento, pontos) VALUES
 ('Ana Souza', 'f', 28, '1996-02-12', 120),
 ('Bruno Lima', 'm', 35, '1989-08-09', 80),

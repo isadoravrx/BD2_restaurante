@@ -1,5 +1,3 @@
-
-
 CREATE VIEW arrecadacao_prato_por_mes AS -- mostra a quantidade vendida e a arrecadação de um prato em determinado mês
 SELECT p.nome AS prato,
        MONTH(v.dia) AS mes,
