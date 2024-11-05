@@ -88,3 +88,90 @@ BEGIN
 	END IF;
 END//
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE Estatisticas()
+BEGIN
+	DECLARE produto_mais_vendido_id INT;
+    DECLARE quantidade_produto_mais_vendido INT;
+    DECLARE produto_menos_vendido_id INT;
+    DECLARE quantidade_produto_menos_vendido INT;
+    
+	SELECT
+		prato.id, SUM(venda.quantidade) INTO produto_mais_vendido_id, quantidade_produto_mais_vendido
+	FROM venda
+    JOIN prato ON prato.id = venda.id_prato
+    GROUP BY prato.id
+    ORDER BY SUM(venda.quantidade) DESC
+    LIMIT 1;
+    
+	SELECT
+		prato.id, SUM(venda.quantidade) INTO produto_menos_vendido_id, quantidade_produto_menos_vendido
+	FROM venda
+    JOIN prato ON prato.id = venda.id_prato
+    GROUP BY prato.id
+    ORDER BY SUM(venda.quantidade) ASC
+    LIMIT 1;
+		
+	SELECT 
+		prato.nome AS nome_produto_mais_vendido,
+		(prato.valor * quantidade_produto_mais_vendido) AS valor_ganho_produto_mais_vendido
+	FROM venda
+    JOIN prato ON prato.id = venda.id_prato
+    WHERE id_prato = produto_mais_vendido_id;
+    
+	SELECT 
+		prato.nome AS nome_produto_menos_vendido,
+		(prato.valor * quantidade_produto_menos_vendido) AS valor_ganho_produto_menos_vendido
+	FROM venda
+    JOIN prato ON prato.id = venda.id_prato
+    WHERE id_prato = produto_menos_vendido_id;
+     
+	SELECT 
+		YEAR(venda.dia) AS ano_maior_venda__produto_mais_vendido,
+		MONTH(venda.dia) AS mes_maior_venda_produto_mais_vendido,
+		SUM(venda.quantidade) AS total_vendido
+	FROM venda
+	JOIN prato ON prato.id = venda.id_prato
+    WHERE prato.id = produto_mais_vendido_id
+	GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+	ORDER BY total_vendido DESC
+	LIMIT 1;
+
+	SELECT 
+		YEAR(venda.dia) AS ano_menor_venda_produto_mais_vendido,
+		MONTH(venda.dia) AS mes_menor_venda_produto_mais_vendido,
+		SUM(venda.quantidade) AS total_vendido
+	FROM venda
+	JOIN prato ON prato.id = venda.id_prato
+    WHERE prato.id = produto_mais_vendido_id
+	GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+	ORDER BY total_vendido ASC
+	LIMIT 1;
+    
+	SELECT 
+		YEAR(venda.dia) AS ano_maior_venda_produto_menos_vendido,
+		MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
+		SUM(venda.quantidade) AS total_vendido
+	FROM venda
+	JOIN prato ON prato.id = venda.id_prato
+    WHERE prato.id = produto_menos_vendido_id
+	GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+	ORDER BY total_vendido ASC
+	LIMIT 1;
+    
+	SELECT 
+		YEAR(venda.dia) AS ano_menor_venda_produto_menos_vendido,
+		MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
+		SUM(venda.quantidade) AS total_vendido
+	FROM venda
+	JOIN prato ON prato.id = venda.id_prato
+    WHERE prato.id = produto_menos_vendido_id
+	GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+	ORDER BY total_vendido ASC
+	LIMIT 1;
+    
+    
+END//
+
+DELIMITER ;
