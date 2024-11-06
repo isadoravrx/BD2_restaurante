@@ -1,5 +1,7 @@
+SET GLOBAL event_scheduler = ON;
+
 CREATE EVENT atualizar_disponibilidade_pratos
-ON SCHEDULE EVERY 1 DAY
+ON SCHEDULE EVERY 1 MINUTE
 DO
 BEGIN
     UPDATE prato
@@ -11,6 +13,23 @@ BEGIN
             SELECT id
             FROM ingredientes
             WHERE data_validade < CURRENT_DATE
+        )
+    );
+END;
+
+CREATE EVENT atualizar_disponibilidade_pratos_quantidade
+ON SCHEDULE EVERY 1 MINUTE
+DO
+BEGIN
+    UPDATE prato
+    SET disponibilidade = FALSE
+    WHERE id IN (
+        SELECT id_prato
+        FROM usos
+        WHERE id_ingrediente IN (
+            SELECT id
+            FROM ingredientes
+            WHERE quantidade <= 0
         )
     );
 END;
