@@ -27,44 +27,44 @@ Equipe:
   - Administrador (possui todas as permissões possíveis);<br/>
   - Gerente (possui permissões de busca, de apagar e de edição dos registros feitos);<br/>
   - Funcionário (possui permissão de adição de novos registros feitos e consultar os<br/>
-registros de venda).<br/>
+registros de venda).<br/><br/>
 
 4. [VIEWS](/Database/d-views.sql)<br/><br/>
   Implementação de 3 views diferentes utilizando JOINs e GROUP BY a cargo do grupo:<br/>
     - Tabela que exibe a quantidade vendida e a arrecadação de um prato em determinado mês<br/>
     - Tabela que informa os ingredientes com validade dentro dos próximos 30 dias ou já expiradas, e em qual prato ocorre seu uso<br/>
-    - Tabela que informa o total de consumo por cliente<br/>
+    - Tabela que informa o total de consumo por cliente<br/><br/>
 
 5. [TRIGGERS](/Database/e-triggers.sql)<br/><br/>
-  O cliente ganha 1 ponto para cada 10 reais gastos, implemente o trigger que 
+  - O cliente ganha 1 ponto para cada 10 reais gastos, implemente o trigger que 
 automatiza este calculo;<br/>
-  Quando um ingrediente vence a validade torne o prato que tem o ingrediente 
+  - Quando um ingrediente vence a validade torne o prato que tem o ingrediente 
 vencido indisponível;<br/>
-  Se o cliente está tentando comprar um prato que está indisponível, não realize a 
+  - Se o cliente está tentando comprar um prato que está indisponível, não realize a 
 compra;<br/>
-  Venda – Sempre que uma venda for feita reduza em 1 a quantidade do produto na 
-base de dados.<br/>
+  - Venda – Sempre que uma venda for feita reduza em 1 a quantidade do produto na 
+base de dados.<br/><br/>
 
 6. [STORED PROCEDURES](Database/g-stored_procedures.sql)<br/><br/>
    Reajuste - Recebe um reajuste em percentual e aumenta o valor de todos os pratos.<br/>
    Sorteio – Sorteia aleatoriamente um cliente para que este cliente receba uma<br/>
 premiação de 100 pontos.<br/> 
    Estatísticas - na tabela de vendas e exibe as seguintes estatísticas:<br/>
-  - Produto mais vendido<br/> 
-  - Vendedor associado ao produto mais vendido<br/> 
-  - Produto menos vendido<br/> 
-  - Valor ganho com o produto mais vendido<br/> 
-  - Mês de maior vendas e mês de menor vendas do produto mais vendido<br/> 
-  - Valor ganho com o produto menos vendido<br/> 
-  - Mês de maior vendas e mês de menor vendas do produto menos vendido<br/> 
+      - Produto mais vendido<br/> 
+      - Vendedor associado ao produto mais vendido<br/> 
+      - Produto menos vendido<br/> 
+      - Valor ganho com o produto mais vendido<br/> 
+      - Mês de maior vendas e mês de menor vendas do produto mais vendido<br/> 
+      - Valor ganho com o produto menos vendido<br/> 
+      - Mês de maior vendas e mês de menor vendas do produto menos vendido<br/> 
 
-  Gastar_ponto - Usa todos os pontos do usuário para comprar um prato, cada ponto<br/> 
+    Gastar_ponto - Usa todos os pontos do usuário para comprar um prato, cada ponto<br/> 
 está na proporção de 1:1 em valor de reais, caso o valor do prato tenha centavos use<br/> 
 um ponto extra para cobrir estes centavos, e caso a quantidade de pontos for maior<br/> 
 do que o valor do prato o cliente devera ficar com a diferença e não ter o saldo<br/> 
-zerado.<br/>
+zerado.<br/><br/>
 
-7. [FUNÇÃO](Database/f-function.sql)<br/> 
+7. [FUNÇÃO](Database/f-function.sql)<br/><br/> 
   Cálculo: Recebe um valor representando a compra e retorna a quantidade de pontos<br/> 
 referente à compra, 1 ponto para cada 10 reais gastos, valores que não completam<br/> 
 os 10 reais NÃO geram ponto; 
