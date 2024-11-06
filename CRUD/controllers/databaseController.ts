@@ -290,7 +290,7 @@ export const createTriggers = async (connection) => {
         FOR EACH ROW
         BEGIN
             UPDATE ingredientes
-            SET quantidade = quantidade - 1
+            SET quantidade = quantidade - NEW.quantidade
             WHERE id IN (
                 SELECT id_ingrediente 
                 FROM usos
@@ -329,8 +329,10 @@ export const createEvents = async(connection) => {
     try{
     const sql = 
     `
+        SET GLOBAL event_scheduler = ON;
+
         CREATE EVENT atualizar_disponibilidade_pratos 
-        ON SCHEDULE EVERY 1 DAY 
+        ON SCHEDULE EVERY 1 MINUTE 
         DO
         BEGIN
             UPDATE prato
@@ -342,6 +344,24 @@ export const createEvents = async(connection) => {
                     SELECT id
                     FROM ingredientes
                     WHERE data_validade < CURRENT_DATE
+                )
+            );
+        END;
+
+
+        CREATE EVENT atualizar_disponibilidade_pratos_quantidade
+        ON SCHEDULE EVERY 1 MINUTE
+        DO
+        BEGIN
+            UPDATE prato
+            SET disponibilidade = FALSE
+            WHERE id IN (
+                SELECT id_prato
+                FROM usos
+                WHERE id_ingrediente IN (
+                    SELECT id
+                    FROM ingredientes
+                    WHERE quantidade <= 0
                 )
             );
         END;
@@ -469,6 +489,89 @@ export const createStoredProcedures = async(connection) => {
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'Pontos insuficientes para realizar a compra.';
             END IF;
+        END;
+
+
+        CREATE PROCEDURE Estatisticas()
+        BEGIN
+            DECLARE produto_mais_vendido_id INT;
+            DECLARE quantidade_produto_mais_vendido INT;
+            DECLARE produto_menos_vendido_id INT;
+            DECLARE quantidade_produto_menos_vendido INT;
+            
+            SELECT
+                prato.id, SUM(venda.quantidade) INTO produto_mais_vendido_id, quantidade_produto_mais_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            GROUP BY prato.id
+            ORDER BY SUM(venda.quantidade) DESC
+            LIMIT 1;
+            
+            SELECT
+                prato.id, SUM(venda.quantidade) INTO produto_menos_vendido_id, quantidade_produto_menos_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            GROUP BY prato.id
+            ORDER BY SUM(venda.quantidade) ASC
+            LIMIT 1;
+                
+            SELECT 
+                prato.nome AS nome_produto_mais_vendido,
+                (prato.valor * quantidade_produto_mais_vendido) AS valor_ganho_produto_mais_vendido
+            FROM prato
+            WHERE prato.id = produto_mais_vendido_id;
+            
+            SELECT 
+                prato.nome AS nome_produto_menos_vendido,
+                (prato.valor * quantidade_produto_menos_vendido) AS valor_ganho_produto_menos_vendido
+            FROM prato
+            WHERE prato.id = produto_menos_vendido_id;
+            
+            SELECT 
+                YEAR(venda.dia) AS ano_maior_venda__produto_mais_vendido,
+                MONTH(venda.dia) AS mes_maior_venda_produto_mais_vendido,
+                SUM(venda.quantidade) AS total_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            WHERE prato.id = produto_mais_vendido_id
+            GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+            ORDER BY total_vendido DESC
+            LIMIT 1;
+
+            SELECT 
+                YEAR(venda.dia) AS ano_menor_venda_produto_mais_vendido,
+                MONTH(venda.dia) AS mes_menor_venda_produto_mais_vendido,
+                SUM(venda.quantidade) AS total_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            WHERE prato.id = produto_mais_vendido_id
+            GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+            ORDER BY total_vendido ASC
+            LIMIT 1;
+            
+            SELECT 
+                YEAR(venda.dia) AS ano_maior_venda_produto_menos_vendido,
+                MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
+                SUM(venda.quantidade) AS total_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            WHERE prato.id = produto_menos_vendido_id
+            GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+            ORDER BY total_vendido ASC
+            LIMIT 1;
+            
+            SELECT 
+                YEAR(venda.dia) AS ano_menor_venda_produto_menos_vendido,
+                MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
+                SUM(venda.quantidade) AS total_vendido
+            FROM venda
+            JOIN prato ON prato.id = venda.id_prato
+            WHERE prato.id = produto_menos_vendido_id
+            GROUP BY YEAR(venda.dia), MONTH(venda.dia)
+            ORDER BY total_vendido ASC
+            LIMIT 1;
+            
+            
         END;
         
     `;
