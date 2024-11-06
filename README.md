@@ -1,4 +1,4 @@
-# Projeto Banco de Dados II
+# Projeto Banco de Dados II - Restaurante
 
 Equipe:
 > Isadora Xavier<br/>
