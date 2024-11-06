@@ -11,7 +11,7 @@ Equipe:
   O sistema possui a opção de cadastrar cada um dos itens.<br/><br/>
 
 2. INICIALIZAÇÃO DO BANCO DE DADOS RESTAURANTE<br/>
-  - [Criação do banco de dados e das tabelas e constraints;](/Database/a-tables.sql)<br/>
+  - [Criação do banco de dados, das tabelas e dos constraints;](/Database/a-tables.sql)<br/>
     - cliente(id, nome, sexo, idade, nascimento, pontos) 
     - prato(id, nome, descricao, valor, disponibilidade) 
     - fornecedor(id, nome, estado_origem) 
