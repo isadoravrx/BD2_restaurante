@@ -7,8 +7,8 @@ Equipe:
 > Maria Eduarda Santana<br/><br/>
 
 1. [CRUD](/CRUD)<br/><br/>
-  O sistema deve conter a opção de criar e de destruir completamente o banco de dados;<br/>
-  O sistema deve possuir a opção de cadastrar cada um dos itens.<br/><br/>
+  O sistema pode criar e de destruir completamente o banco de dados;<br/>
+  O sistema possui a opção de cadastrar cada um dos itens.<br/><br/>
 
 2. INICIALIZAÇÃO DO BANCO DE DADOS RESTAURANTE<br/>
   - [Criação do banco de dados e das tabelas e constraints;](/Database/a-tables.sql)<br/>
@@ -21,13 +21,13 @@ Equipe:
     -  Sexo deve ser ‘m’ ou ‘f’ ou ‘o’ 
     -  Cidade_origem deve ser um dos estados brasileiros 
     -  Disponibilidade deve ser um booleano, true ele está disponível, false ele está indispinível<br/>
-  - [O sistema deve possuir 10 elementos já cadastrados de cada tabela.](/Database/b-inserts.sql)<br/><br/>
+  - [O sistema contém 10 elementos já cadastrados em cada tabela.](/Database/b-inserts.sql)<br/><br/>
 
 3. [USUÁRIOS E PRIVILÉGIOS](/Database/c-user_privileges.sql)<br/><br/>
-  Administrador – Com todas as permissões possíveis;<br/>
-  Gerente – Com permissões de busca, de apagar e de edição dos registros feitos;<br/>
-  Funcionário - Com permissão de adição de novos registros feitos e consultar os<br/>
-registros de venda.<br/>
+  - Administrador (possui todas as permissões possíveis);<br/>
+  - Gerente (possui permissões de busca, de apagar e de edição dos registros feitos);<br/>
+  - Funcionário (possui permissão de adição de novos registros feitos e consultar os<br/>
+registros de venda).<br/>
 
 4. [VIEWS](/Database/d-views.sql)<br/><br/>
   Implementação de 3 views diferentes utilizando JOINs e GROUP BY a cargo do grupo:<br/>
@@ -46,11 +46,11 @@ compra;<br/>
 base de dados.<br/>
 
 6. [STORED PROCEDURES](Database/g-stored_procedures.sql)<br/><br/>
-   Reajuste - Receba um reajuste em percentual e aumente o valor de todos os pratos.<br/>
-   Sorteio – Sorteie aleatoriamente um cliente para que este cliente receba uma<br/>
+   Reajuste - Recebe um reajuste em percentual e aumenta o valor de todos os pratos.<br/>
+   Sorteio – Sorteia aleatoriamente um cliente para que este cliente receba uma<br/>
 premiação de 100 pontos.<br/> 
-   Estatísticas - Vá na tabela de vendas e exiba as seguintes estatísticas:<br/>
-  -  Produto mais vendido<br/> 
+   Estatísticas - na tabela de vendas e exibe as seguintes estatísticas:<br/>
+  - Produto mais vendido<br/> 
   - Vendedor associado ao produto mais vendido<br/> 
   - Produto menos vendido<br/> 
   - Valor ganho com o produto mais vendido<br/> 
@@ -58,7 +58,7 @@ premiação de 100 pontos.<br/>
   - Valor ganho com o produto menos vendido<br/> 
   - Mês de maior vendas e mês de menor vendas do produto menos vendido<br/> 
 
-  Gastar_ponto - Use todos os pontos do usuário para comprar um prato, cada ponto<br/> 
+  Gastar_ponto - Usa todos os pontos do usuário para comprar um prato, cada ponto<br/> 
 está na proporção de 1:1 em valor de reais, caso o valor do prato tenha centavos use<br/> 
 um ponto extra para cobrir estes centavos, e caso a quantidade de pontos for maior<br/> 
 do que o valor do prato o cliente devera ficar com a diferença e não ter o saldo<br/> 
