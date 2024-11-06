@@ -6,7 +6,7 @@ Equipe:
 > Marcelo Henrique<br/>
 > Maria Eduarda Santana<br/><br/>
 
-1. [CRUD](/CRUD)<br/><br/>
+1. [CRUD](/CRUD) - TypeScript<br/><br/>
   O sistema pode criar e de destruir completamente o banco de dados;<br/>
   O sistema possui a opção de cadastrar cada um dos itens.<br/><br/>
 
