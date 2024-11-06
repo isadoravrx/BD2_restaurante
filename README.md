@@ -7,7 +7,7 @@ Equipe:
 > Maria Eduarda Santana<br/><br/>
 
 1. [CRUD](/CRUD) - TypeScript e SQL<br/><br/>
-  O sistema pode criar e de destruir completamente o banco de dados;<br/>
+  O sistema pode criar e destruir completamente o banco de dados;<br/>
   O sistema possui a opção de cadastrar cada um dos itens.<br/><br/>
 
 2. INICIALIZAÇÃO DO BANCO DE DADOS RESTAURANTE<br/>
