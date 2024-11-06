@@ -24,7 +24,7 @@ AFTER INSERT ON venda
 FOR EACH ROW
 BEGIN
     UPDATE ingredientes
-    SET quantidade = quantidade - 1
+    SET quantidade = quantidade - NEW.quantidade
     WHERE id IN (
         SELECT id_ingrediente
         FROM usos
