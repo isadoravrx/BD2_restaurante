@@ -562,13 +562,13 @@ export const createStoredProcedures = async(connection) => {
             
             SELECT 
                 YEAR(venda.dia) AS ano_menor_venda_produto_menos_vendido,
-                MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
+                MONTH(venda.dia) AS mes_maior_venda_produto_menos_vendido,
                 SUM(venda.quantidade) AS total_vendido
             FROM venda
             JOIN prato ON prato.id = venda.id_prato
             WHERE prato.id = produto_menos_vendido_id
             GROUP BY YEAR(venda.dia), MONTH(venda.dia)
-            ORDER BY total_vendido ASC
+            ORDER BY total_vendido DESC
             LIMIT 1;
             
             
