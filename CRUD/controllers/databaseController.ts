@@ -550,7 +550,7 @@ export const createStoredProcedures = async(connection) => {
             LIMIT 1;
             
             SELECT 
-                YEAR(venda.dia) AS ano_maior_venda_produto_menos_vendido,
+                YEAR(venda.dia) AS ano_menor_venda_produto_menos_vendido,
                 MONTH(venda.dia) AS mes_menor_venda_produto_menos_vendido,
                 SUM(venda.quantidade) AS total_vendido
             FROM venda
@@ -561,7 +561,7 @@ export const createStoredProcedures = async(connection) => {
             LIMIT 1;
             
             SELECT 
-                YEAR(venda.dia) AS ano_menor_venda_produto_menos_vendido,
+                YEAR(venda.dia) AS ano_maior_venda_produto_menos_vendido,
                 MONTH(venda.dia) AS mes_maior_venda_produto_menos_vendido,
                 SUM(venda.quantidade) AS total_vendido
             FROM venda
